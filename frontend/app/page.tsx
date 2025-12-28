@@ -106,7 +106,7 @@ export default function HomePage() {
           className="mt-8 flex flex-col items-center gap-4"
         >
           {/* Links */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* GitHub */}
             <a
               href="https://github.com/ayoisio/way-back-home"
@@ -122,19 +122,30 @@ export default function HomePage() {
               </svg>
             </a>
             
-            {/* Codelab */}
+            {/* Level 0 Codelab */}
             <a
               href="https://codelabs.developers.google.com/way-back-home-level-0/instructions"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-full bg-space-void-lighter/50 text-space-lavender/60 
-                         hover:bg-space-void-lighter/70 hover:text-space-cream transition-all
-                         backdrop-blur-sm"
-              title="View Codelab"
+              className="w-9 h-9 rounded-full bg-space-void-lighter/50 text-space-lavender/60 
+                         hover:bg-space-void-lighter/70 hover:text-space-mint transition-all
+                         backdrop-blur-sm flex items-center justify-center font-mono text-xs font-bold"
+              title="Level 0 Codelab"
             >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
-              </svg>
+              L0
+            </a>
+            
+            {/* Level 1 Codelab */}
+            <a
+              href="https://codelabs.developers.google.com/way-back-home-level-1/instructions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-full bg-space-void-lighter/50 text-space-lavender/60 
+                         hover:bg-space-void-lighter/70 hover:text-space-orange transition-all
+                         backdrop-blur-sm flex items-center justify-center font-mono text-xs font-bold"
+              title="Level 1 Codelab"
+            >
+              L1
             </a>
           </div>
           

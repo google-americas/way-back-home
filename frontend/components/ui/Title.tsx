@@ -134,7 +134,7 @@ export function MapTitle({ eventName }: { eventName?: string }) {
  */
 export function MapFooterLinks() {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       {/* GitHub */}
       <a
         href="https://github.com/ayoisio/way-back-home"
@@ -149,18 +149,30 @@ export function MapFooterLinks() {
         </svg>
       </a>
       
-      {/* Codelabs */}
+      {/* Level 0 Codelab */}
       <a
         href="https://codelabs.developers.google.com/way-back-home-level-0/instructions"
         target="_blank"
         rel="noopener noreferrer"
-        className="p-2 rounded-full bg-space-void-lighter/30 text-space-lavender/40 
-                   hover:bg-space-void-lighter/50 hover:text-space-cream transition-all"
-        title="View Codelab"
+        className="w-7 h-7 rounded-full bg-space-void-lighter/30 text-space-lavender/40 
+                   hover:bg-space-void-lighter/50 hover:text-space-mint transition-all
+                   flex items-center justify-center font-mono text-[10px] font-bold"
+        title="Level 0 Codelab"
       >
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
-        </svg>
+        L0
+      </a>
+      
+      {/* Level 1 Codelab */}
+      <a
+        href="https://codelabs.developers.google.com/way-back-home-level-1/instructions"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-7 h-7 rounded-full bg-space-void-lighter/30 text-space-lavender/40 
+                   hover:bg-space-void-lighter/50 hover:text-space-orange transition-all
+                   flex items-center justify-center font-mono text-[10px] font-bold"
+        title="Level 1 Codelab"
+      >
+        L1
       </a>
     </div>
   )
