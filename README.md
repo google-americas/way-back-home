@@ -7,8 +7,8 @@
 Way Back Home is a hands-on workshop experience that teaches Google Cloud AI technologies through an engaging narrative. Participants crash-land on an alien planet and must use AI to identify themselves, analyze their surroundings, and coordinate rescue efforts.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-waybackhome.dev-blue?style=for-the-badge)](https://waybackhome.dev)
-[![Codelab](https://img.shields.io/badge/Codelab-Level%200-green?style=for-the-badge)](https://codelabs.developers.google.com/way-back-home-level-0)
-[![Codelab](https://img.shields.io/badge/Codelab-Level%31-orange?style=for-the-badge)](https://codelabs.developers.google.com/way-back-home-level-1)
+[![Codelab](https://img.shields.io/badge/Codelab-Level%200-green?style=for-the-badge)](https://codelabs.developers.google.com/way-back-home-level-0/instructions)
+[![Codelab](https://img.shields.io/badge/Codelab-Level%31-orange?style=for-the-badge)](https://codelabs.developers.google.com/way-back-home-level-1/instructions)
 
 ## 🎮 The Experience
 
@@ -49,7 +49,7 @@ You're a space explorer whose ship has crashed on an uncharted planet. Your resc
    cd level_0
    ```
 
-4. **Follow the codelab:** [Level 0 Instructions](https://codelabs.developers.google.com/way-back-home-level-0)
+4. **Follow the codelab:** [Level 0 Instructions](https://codelabs.developers.google.com/way-back-home-level-0/instructions)
 
 ### For Workshop Hosts
 
