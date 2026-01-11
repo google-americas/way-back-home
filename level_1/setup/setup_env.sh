@@ -86,6 +86,10 @@ else
         --display-name="Way Back Home Workshop Service Account" \
         --project=$PROJECT_ID
     echo "      ✓ Service account '$SA_NAME' created"
+    
+    # Wait for identity propagation to prevent "Service account not found" errors
+    echo "      ⏳ Waiting 10 seconds for identity propagation..."
+    sleep 10
 fi
 
 # Grant Vertex AI User role (for Gemini)
@@ -139,8 +143,15 @@ echo "      ✓ Storage Object Viewer role granted"
 echo ""
 echo "[4/6] Configuring Cloud Build IAM for deployments..."
 
-# Get project number (needed for service account emails)
-PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')
+# Robust retrieval of Project Number with retry
+# We use '|| true' to prevent 'set -e' from exiting if the first attempt fails
+PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)' 2>/dev/null || true)
+
+if [ -z "$PROJECT_NUMBER" ]; then
+    echo "      ⚠️  First attempt to get Project Number failed. Retrying..."
+    sleep 5
+    PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')
+fi
 
 # Default compute service account (used during Cloud Build steps)
 COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
@@ -332,6 +343,5 @@ echo "  • GOOGLE_CLOUD_LOCATION=$REGION"
 echo ""
 echo "Next steps:"
 echo "  1. Source the environment: source ~/way-back-home/set_env.sh"
-echo "  2. Set up the star catalog: python setup/setup_star_catalog.py"
-echo "  3. Continue with the codelab instructions"
+echo "  2. Continue with the codelab instructions"
 echo ""
