@@ -39,7 +39,7 @@ You're a space explorer whose ship has crashed on an uncharted planet. Your resc
 
 2. **Clone and setup:**
    ```bash
-   git clone https://github.com/GoogleCloudPlatform/way-back-home.git
+   git clone https://github.com/google-americas/way-back-home.git
    cd way-back-home
    ```
 
@@ -108,7 +108,7 @@ See [Deployment Guide](#-deployment) below for running your own instance.
 
 2. **Clone and configure:**
    ```bash
-   git clone https://github.com/GoogleCloudPlatform/way-back-home.git
+   git clone https://github.com/google-americas/way-back-home.git
    cd way-back-home
    
    # Configure your project
