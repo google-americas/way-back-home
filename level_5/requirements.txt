@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+numpy
+google-genai
+websockets
+python-dotenv
+google-adk
+a2a-sdk
+aiokafka

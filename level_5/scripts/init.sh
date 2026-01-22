@@ -5,7 +5,11 @@ handle_error() {
   echo -e "\n\n*******************************************************"
   echo "Error: $1"
   echo "*******************************************************"
-  exit 1
+  # Instead of exiting, we warn the user and wait for input
+  echo "The script encountered an error."
+  echo "Press [Enter] to ignore this error and attempt to continue."
+  echo "Press [Ctrl+C] to exit the script completely."
+  read -r # Pauses script here
 }
 
 # --- Part 1: Find or Create Google Cloud Project ID ---
@@ -45,7 +49,6 @@ if [ "$PROJECT_ID_SET" = false ]; then
       handle_error "The project prefix '$CODELAB_PROJECT_PREFIX' is too long (${PREFIX_LEN} chars). Maximum is 25."
     fi
     MAX_SUFFIX_LEN=$(( 30 - PREFIX_LEN - 1 ))
-    echo "Project prefix '${CODELAB_PROJECT_PREFIX}' is ${PREFIX_LEN} chars. Suffix will be ${MAX_SUFFIX_LEN} chars."
 
     # Loop until a project is successfully created.
     while true; do
@@ -79,12 +82,12 @@ if [ "$PROJECT_ID_SET" = false ]; then
 fi
 
 # --- Part 2: Install Dependencies and Run Billing Setup ---
-# This part runs for both existing and newly created projects.
 echo -e "\n--- Installing Python dependencies ---"
+# Using || handle_error means if it fails, it will pause, allow you to read, and then proceed
 pip install --upgrade --user google-cloud-billing || handle_error "Failed to install Python libraries."
 
 echo -e "\n--- Running the Billing Enablement Script ---"
-python3 billing-enablement.py || handle_error "The billing enablement script failed. See the output above for details."
+python3 billing-enablement.py || handle_error "The billing enablement script failed."
 
 echo -e "\n--- Full Setup Complete ---"
-exit 0
+
