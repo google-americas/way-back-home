@@ -34,13 +34,13 @@ logger.setLevel(logging.INFO)
 
 from contextlib import asynccontextmanager
 
-#REPLACE-CREATE-KAFKA-A2A-SERVER
+#REPLACE-CONNECT-TO-KAFKA-CLUSTER
 
 app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=r"https://.*\.cloudshell\.dev|http://localhost.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -103,6 +103,31 @@ async def update_pod_manual(update: PodUpdate):
         
     return {"status": "updated", "id": update.id}
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Ensure API routes are above this!
+
+# Serve Static Assets (JS/CSS)
+# We assume the user has run 'npm run build' in ../frontend
+# resulting in ../frontend/dist
+dist_dir = os.path.join(os.path.dirname(__file__), "../frontend/dist")
+
+if os.path.exists(dist_dir):
+    app.mount("/assets", StaticFiles(directory=os.path.join(dist_dir, "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_react_app(full_path: str):
+        # 1. If it matches an underlying file (like favicon.svg), serve it
+        possible_file = os.path.join(dist_dir, full_path)
+        if os.path.isfile(possible_file):
+            return FileResponse(possible_file)
+        
+        # 2. Otherwise return index.html for SPA routing
+        return FileResponse(os.path.join(dist_dir, "index.html"))
+else:
+    logger.warning("Frontend build not found. Please run 'npm run build' in frontend/.")
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, proxy_headers=True, forwarded_allow_ips="*")

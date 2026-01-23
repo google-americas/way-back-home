@@ -61,8 +61,7 @@ export default function MissionDashboard() {
     useEffect(() => {
         console.log("Connecting to Mission Stream...");
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-        const sse = new EventSource(`${apiUrl}/stream`);
-
+        const sse = new EventSource(`${apiUrl}/stream`, { withCredentials: true });
         // Pod Visuals
         sse.addEventListener("pod_update", (event) => {
             try {

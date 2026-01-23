@@ -108,15 +108,7 @@ else
     ALL_PASSED=false
 fi
 
-# ------------------------------------------------------------------------------
-# 4. Check Environment Variables (.env)
-# ------------------------------------------------------------------------------
-if [ -f ".env" ]; then
-    echo -e "✅ Configuration: ${GREEN}.env found${NC}"
-else
-    echo -e "⚠️  Configuration: ${YELLOW}.env file missing${NC}"
-    echo "   (Ensure you have created your .env file with API keys and Broker URLs)"
-fi
+
 
 # ------------------------------------------------------------------------------
 # Final Summary
