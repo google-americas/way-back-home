@@ -17,7 +17,7 @@ YELLOW='\033[1;33m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
-echo -e "${BOLD}🚀 Verifying Mission Charlie (Level 5) Infrastructure...${NC}\n"
+echo -e "${BOLD}🚀 Verifying Mission Alpha (Level 3) Infrastructure...${NC}\n"
 
 ALL_PASSED=true
 
