@@ -124,8 +124,18 @@ export default function VolatileWorkbench() {
             // Random Session ID for multi-user isolation
             const sessionId = "session-" + Math.random().toString(36).substring(2, 9);
             console.log("Connecting with Session ID:", sessionId);
-            // console.log("Attempting to connect to WS at ws://localhost:8000/ws/user1/default-session");
-            const ws = new WebSocket(`ws://localhost:8000/ws/user1/${sessionId}`);
+            // Dynamic URL for Cloud Run (https/wss) vs Local (http/ws)
+            const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            let host = window.location.host;
+
+            // Dev Fallback: If running on Vite port 5173, assume backend is at 8000
+            if (host.includes(":5173")) {
+                host = "localhost:8000";
+            }
+
+            const wsUrl = `${protocol}//${host}/ws/user1/${sessionId}`;
+            // console.log("Attempting to connect to WS at", wsUrl);
+            const ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
                 // console.log("WebSocket Connection OPENED");
@@ -267,8 +277,9 @@ export default function VolatileWorkbench() {
             if (ws.readyState !== WebSocket.OPEN) return;
 
             // Draw video frame to canvas
-            canvas.width = video.videoWidth * 0.5; // Scale down for performance
-            canvas.height = video.videoHeight * 0.5;
+            // Use full resolution for better text recognition
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             const base64Img = canvas.toDataURL("image/jpeg", 0.6).split(',')[1];

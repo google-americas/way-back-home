@@ -24,7 +24,7 @@ load_dotenv()
 
 from .hazard_db import PART_HAZARDS
 
-ARCHITECT_URL = os.environ.get("ARCHITECT_URL","localhost:8081")
+ARCHITECT_URL = os.environ.get("ARCHITECT_URL","http://localhost:8081")
 
 #REPLACE-REMOTEA2AAGENT
 
