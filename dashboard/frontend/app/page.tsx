@@ -147,6 +147,45 @@ export default function HomePage() {
             >
               L1
             </a>
+
+             {/* Level 3 Codelab */}
+            <a
+              href="https://codelabs.developers.google.com/way-back-home-level-3/instructions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-full bg-space-void-lighter/50 text-space-lavender/60 
+                         hover:bg-space-void-lighter/70 hover:text-space-orange transition-all
+                         backdrop-blur-sm flex items-center justify-center font-mono text-xs font-bold"
+              title="Level 1 Codelab"
+            >
+              L1
+            </a>
+
+             {/* Level 4 Codelab */}
+            <a
+              href="https://codelabs.developers.google.com/way-back-home-level-4/instructions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-full bg-space-void-lighter/50 text-space-lavender/60 
+                         hover:bg-space-void-lighter/70 hover:text-space-orange transition-all
+                         backdrop-blur-sm flex items-center justify-center font-mono text-xs font-bold"
+              title="Level 1 Codelab"
+            >
+              L1
+            </a>
+
+             {/* Level 5 Codelab */}
+            <a
+              href="https://codelabs.developers.google.com/way-back-home-level-5/instructions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-full bg-space-void-lighter/50 text-space-lavender/60 
+                         hover:bg-space-void-lighter/70 hover:text-space-orange transition-all
+                         backdrop-blur-sm flex items-center justify-center font-mono text-xs font-bold"
+              title="Level 1 Codelab"
+            >
+              L1
+            </a>
           </div>
           
           <p className="text-xs text-space-lavender/40">
