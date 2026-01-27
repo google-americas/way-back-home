@@ -9,6 +9,10 @@ export default function MissionDashboard() {
     const [customFormation, setCustomFormation] = useState("");
     const [isTransmitting, setIsTransmitting] = useState(false);
 
+    // Mission Success State
+    const [formationCount, setFormationCount] = useState(0);
+    const [missionSuccess, setMissionSuccess] = useState(false);
+
     // Drag Refs
     const draggedIdRef = useRef(null);
     const [draggedPod, setDraggedPod] = useState(null); // For UI visual feedback if needed
@@ -60,8 +64,9 @@ export default function MissionDashboard() {
     // --- Data Stream ---
     useEffect(() => {
         console.log("Connecting to Mission Stream...");
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const apiUrl = import.meta.env.VITE_API_URL || '';
         const sse = new EventSource(`${apiUrl}/stream`, { withCredentials: true });
+
         // Pod Visuals
         sse.addEventListener("pod_update", (event) => {
             try {
@@ -125,21 +130,104 @@ export default function MissionDashboard() {
         });
     };
 
+    const updateStatus = async () => {
+        try {
+            // Use fetch instead of import to avoid build/runtime errors if file is missing
+            console.log('[MissionDashboard] Attempting to fetch config.json...');
+            let config = null;
+            try {
+                const configResponse = await fetch('/config.json');
+                if (configResponse.ok) {
+                    config = await configResponse.json();
+                } else {
+                    console.log('[MissionDashboard] config.json not found (status:', configResponse.status, ')');
+                }
+            } catch (e) {
+                console.log('[MissionDashboard] Error fetching config.json:', e);
+            }
+
+            if (config && config.participant_id && config.api_base) {
+                console.log('[MissionDashboard] found config.json:', config);
+
+                const response = await fetch(`${config.api_base}/participants/${config.participant_id}`);
+                if (!response.ok) {
+                    console.error('[MissionDashboard] GET participant failed:', response.status);
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('[MissionDashboard] GET participant success:', data);
+
+                // Update level 3 to true (Mission Charlie)
+                const updatedData = { ...data, level_5_complete: true };
+
+                // Calculate completion percentage
+                let labsCompleted = 0;
+                if (updatedData.level_1_complete) labsCompleted++;
+                if (updatedData.level_2_complete) labsCompleted++;
+                if (updatedData.level_3_complete) labsCompleted++;
+                if (updatedData.level_4_complete) labsCompleted++;
+                if (updatedData.level_5_complete) labsCompleted++;
+
+                const completion_percentage = labsCompleted * 20;
+                const patchPayload = {
+                    level_3_complete: true,
+                    completion_percentage: completion_percentage
+                };
+
+                console.log('[MissionDashboard] PATCH payload:', patchPayload);
+
+                const patchResponse = await fetch(`${config.api_base}/participants/${config.participant_id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(patchPayload),
+                });
+
+                if (patchResponse.ok) {
+                    console.log('[MissionDashboard] PATCH success');
+                    addLog("MISSION STATUS UPDATED: CENTRAL COMMAND NOTIFIED");
+                } else {
+                    console.error('[MissionDashboard] PATCH failed:', patchResponse.status);
+                }
+            } else {
+                console.log('[MissionDashboard] config.json missing required fields or not found');
+            }
+        } catch (err) {
+            // Config not found or API error, ignore as per instructions
+            console.log('Optional config not found or update failed:', err);
+        }
+    };
+
     const requestFormation = async (fmt) => {
         addLog(`CMD >> FORMATION_REQ: ${fmt}`);
         setIsTransmitting(true);
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            const apiUrl = import.meta.env.VITE_API_URL || '';
             await fetch(`${apiUrl}/formation`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ formation: fmt })
             });
 
             setIsTransmitting(false);
             addLog(`TX_COMPLETE: ${fmt} uplink established`);
             setSignalStrength(s => Math.max(0, s - 50)); // Power drain on transmission end
+
+            // Increment success count
+            setFormationCount(prev => {
+                const newState = prev + 1;
+                if (newState >= 3) {
+                    setTimeout(() => {
+                        setMissionSuccess(true);
+                        updateStatus();
+                    }, 15000); // wait before success
+                }
+                return newState;
+            });
 
 
         } catch (e) {
@@ -178,12 +266,13 @@ export default function MissionDashboard() {
 
             if (pod) {
                 // Determine API URL for persistence
-                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+                const apiUrl = import.meta.env.VITE_API_URL || '';
 
                 // Fire and forget update
                 fetch(`${apiUrl}/update_pod`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ id: pod.id, x: Math.round(pod.x), y: Math.round(pod.y) })
                 }).catch(e => console.error("Failed to persist drag:", e));
 
@@ -238,6 +327,25 @@ export default function MissionDashboard() {
                             <span>UPLINKING TO CONSTELLATION...</span>
                             <span className="text-cyan-600 font-bold tracking-widest">{scrambleText}</span>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MISSION SUCCESS OVERLAY */}
+            {missionSuccess && (
+                <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md">
+                    <div className="flex flex-col items-center gap-8 animate-in fade-in zoom-in duration-1000">
+                        <h1 className="text-6xl font-black text-green-500 tracking-widest drop-shadow-[0_0_25px_rgba(34,197,94,0.6)] animate-pulse text-center">
+                            MISSION SUCCESS
+                        </h1>
+                        <div className="text-2xl text-green-300 font-mono border-t border-b border-green-500/50 py-4 px-12 bg-green-900/20">
+                            CONNECTED TO MOTHERSHIP
+                        </div>
+                        <div className="flex flex-col items-center gap-2 mt-4">
+                            <Send className="w-16 h-16 text-green-500 animate-bounce" />
+                            <span className="text-green-600 text-sm font-bold tracking-wider">RESCUE COORDINATES LOCKED</span>
+                        </div>
+                        <div className="absolute inset-0 border-[20px] border-green-500/10 pointer-events-none"></div>
                     </div>
                 </div>
             )}
@@ -387,6 +495,13 @@ export default function MissionDashboard() {
                     </div>
                 </div>
             </div>
+            {/* DEBUG: JUMP TO SUCCESS */}
+            <button
+                onClick={() => setMissionSuccess(true)}
+                className="absolute bottom-4 right-4 z-[90] bg-slate-800/50 text-slate-500 text-[10px] px-2 py-1 rounded hover:bg-slate-700 hover:text-white transition-colors"
+            >
+                DEBUG: JUMP TO SUCCESS
+            </button>
         </div>
     );
 }
