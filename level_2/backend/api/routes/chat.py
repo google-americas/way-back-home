@@ -27,19 +27,14 @@ if use_memory_bank and agent_engine_id:
     location = os.getenv('REGION')
     
     print(f"INFO: Initializing Vertex AI Services with Agent Engine: {agent_engine_id}")
-    session_service = VertexAiSessionService(
-        project=project_id, 
-        location=location, 
-        agent_engine_id=agent_engine_id
-    )
-    memory_service = VertexAiMemoryBankService(
-        project=project_id, 
-        location=location, 
-        agent_engine_id=agent_engine_id
-    )
+    
+    # TODO: REPLACE_VERTEXAI_SERVICES
+
 else:
     print("INFO: Initializing InMemory Services")
+    
     # TODO: REPLACE_INMEMORY_SERVICES
+    
 
 # Initialize Runner
 # For sub-agents using memory bank, we must ensure memory service is passed to the runner
