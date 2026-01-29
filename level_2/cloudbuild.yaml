@@ -40,19 +40,6 @@ steps:
         echo "Backend URL: $(cat /workspace/backend_url.txt)"
     id: 'get-backend-url'
 
-  # 3b. Explicitly Allow Public Access (IAM)
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'services'
-      - 'add-iam-policy-binding'
-      - 'survivor-backend'
-      - '--region'
-      - '$_REGION'
-      - '--member=allUsers'
-      - '--role=roles/run.invoker'
-    id: 'backend-iam-binding'
 
   # ==============================================================================
   # FRONTEND
@@ -101,19 +88,6 @@ steps:
       - '--allow-unauthenticated'
     id: 'deploy-frontend'
 
-  # 9b. Explicitly Allow Public Access (IAM) - Frontend
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'services'
-      - 'add-iam-policy-binding'
-      - 'survivor-frontend'
-      - '--region'
-      - '$_REGION'
-      - '--member=allUsers'
-      - '--role=roles/run.invoker'
-    id: 'frontend-iam-binding'
 
   # 10. Output Frontend URL
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
