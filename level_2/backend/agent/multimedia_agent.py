@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 # Define summary instructions dynamically based on memory bank availability
-# TODO: REPLACE_SUMMARY_AGENT_PROMPT
+
+summary_instruction="" # TODO: REPLACE_SUMMARY_AGENT_PROMPT
 
 summary_agent = LlmAgent(
     name="SummaryAgent",
