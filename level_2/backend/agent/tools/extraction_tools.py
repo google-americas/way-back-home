@@ -18,17 +18,14 @@ image_extractor = ImageExtractor()
 video_extractor = VideoExtractor()
 
 def upload_media(file_path: str, survivor_id: Optional[str] = None) -> Dict[str, Any]:
-    """Upload media file to GCS and detect its type."""
     pass # TODO: REPLACE_UPLOAD_MEDIA_FUNCTION
 
 
 async def extract_from_media(gcs_uri: str, media_type: str, signed_url: Optional[str] = None) -> Dict[str, Any]:
-    """Extract entities and relationships from uploaded media."""
     pass # TODO: REPLACE_EXTRACT_FROM_MEDIA
 
 
 def save_to_spanner(extraction_result: Any, survivor_id: Optional[str] = None) -> Dict[str, Any]:
-    """Save extracted entities and relationships to Spanner Graph DB."""
     pass # TODO: REPLACE_SPANNER_AGENT
 
 
