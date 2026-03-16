@@ -45,6 +45,37 @@ client = genai.Client(
     location="us-central1"
 )
 
+def get_portrait_prompt() -> str:
+    return f"""Create a stylized space explorer portrait.
+
+Character appearance: {APPEARANCE}
+Name on suit patch: "{USERNAME}"
+Suit color: {SUIT_COLOR}
+
+CRITICAL STYLE REQUIREMENTS:
+- Digital illustration style, clean lines, vibrant saturated colors
+- Futuristic but weathered space suit with visible mission patches
+- Background: Pure solid white (#FFFFFF) - absolutely no gradients, patterns, or elements
+- Frame: Head and shoulders only, 3/4 view facing slightly left
+- Lighting: Soft diffused studio lighting, no harsh shadows
+- Expression: Determined but approachable
+- Art style: Modern animated movie character portrait (similar to Pixar or Dreamworks style)
+
+The white background is essential - the avatar will be composited onto a map."""
+
+
+def get_icon_prompt() -> str:
+    return """Now create a circular map icon of this SAME character.
+
+CRITICAL REQUIREMENTS:
+- SAME person, SAME face, SAME expression, SAME suit — maintain perfect consistency with the portrait
+- Tighter crop: just the head and very top of shoulders
+- Background: Pure solid white (#FFFFFF)
+- Optimized for small display sizes (will be used as a 64px map marker)
+- Keep the exact same art style, colors, and lighting as the portrait
+- Square 1:1 aspect ratio
+
+This icon must be immediately recognizable as the same character from the portrait."""
 
 def generate_explorer_avatar() -> dict:
     """
@@ -61,21 +92,22 @@ def generate_explorer_avatar() -> dict:
     # =========================================================================
     # MODULE_5_STEP_1_CREATE_CHAT_SESSION
     # =========================================================================
-    # TODO: Create a chat session for multi-turn generation
-    #
     # Create a chat session using client.chats.create() with:
     # - model: "gemini-2.5-flash-image" (Nano Banana)
     # - config: GenerateContentConfig with response_modalities=["TEXT", "IMAGE"]
     #
     # Hint: You need to use types.GenerateContentConfig
     # =========================================================================
-    chat = None # Replace this line
+    chat = client.chats.create(
+        model="gemini-2.5-flash-image",  # Nano Banana - Gemini with image generation
+        config=types.GenerateContentConfig(
+            response_modalities=["TEXT", "IMAGE"]
+        )
+    )
 
     # =========================================================================
     # MODULE_5_STEP_2_GENERATE_PORTRAIT
     # =========================================================================
-    # TODO: Generate the explorer portrait
-    #
     # 1. Create a portrait_prompt string that includes:
     #    - APPEARANCE, USERNAME, and SUIT_COLOR variables
     #    - Style requirements (digital illustration, white background, etc.)
@@ -90,13 +122,28 @@ def generate_explorer_avatar() -> dict:
     #
     # 4. Print progress messages for user feedback
     # =========================================================================
-    portrait_image = None # Replace this section
+    print("🎨 Generating your portrait...")
+    portrait_response = chat.send_message(get_portrait_prompt())
+
+    # Extract the image from the response.
+    # Gemini returns a response with multiple "parts" - we need to find the image part.
+    portrait_image = None
+    for part in portrait_response.candidates[0].content.parts:
+        if part.inline_data is not None:
+            # Found the image! Convert from bytes to PIL Image and save.
+            image_bytes = part.inline_data.data
+            portrait_image = Image.open(io.BytesIO(image_bytes))
+            portrait_image.save("outputs/portrait.png")
+            break
+    
+    if portrait_image is None:
+        raise Exception("Failed to generate portrait - no image in response")
+    
+    print("✓ Portrait generated!")
 
     # =========================================================================
     # MODULE_5_STEP_3_GENERATE_ICON
     # =========================================================================
-    # TODO: Generate a consistent map icon
-    #
     # 1. Create an icon_prompt that asks for the SAME character
     #    - Emphasize consistency: "SAME person, SAME face, SAME suit"
     #    - Request tighter crop (head and shoulders only)
@@ -109,7 +156,22 @@ def generate_explorer_avatar() -> dict:
     #
     # 4. Print progress messages for user feedback
     # =========================================================================
-    icon_image = None # Replace this section
+    print("🖼️  Creating map icon...")
+    icon_response = chat.send_message(get_icon_prompt())
+    
+    # Extract the icon image from the response
+    icon_image = None
+    for part in icon_response.candidates[0].content.parts:
+        if part.inline_data is not None:
+            image_bytes = part.inline_data.data
+            icon_image = Image.open(io.BytesIO(image_bytes))
+            icon_image.save("outputs/icon.png")
+            break
+    
+    if icon_image is None:
+        raise Exception("Failed to generate icon - no image in response")
+    
+    print("✓ Icon generated!")
 
     return {
         "portrait_path": "outputs/portrait.png",
