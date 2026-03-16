@@ -63,6 +63,25 @@ CRITICAL STYLE REQUIREMENTS:
 
 The white background is essential - the avatar will be composited onto a map."""
 
+def get_photo_portrait_prompt() -> str:
+    return f"""Transform this person into a stylized space explorer portrait.
+
+PRESERVE from the original photo:
+- The person's facial features, face shape, and likeness
+- Their general expression and personality
+- Any distinctive features (glasses, facial hair, etc.)
+
+TRANSFORM with this style:
+- Digital illustration style, clean lines, vibrant saturated colors
+- Add a futuristic space suit with the name "{USERNAME}" on a shoulder patch
+- Suit color: {SUIT_COLOR}
+- Background: Pure solid white (#FFFFFF) - no gradients or elements
+- Frame: Head and shoulders, 3/4 view
+- Lighting: Soft diffused studio lighting
+- Art style: Modern animated movie character (Pixar/Dreamworks aesthetic)
+
+The result should be clearly recognizable as THIS specific person, but illustrated as a heroic space explorer."""
+
 
 def get_icon_prompt() -> str:
     return """Now create a circular map icon of this SAME character.
@@ -122,8 +141,29 @@ def generate_explorer_avatar() -> dict:
     #
     # 4. Print progress messages for user feedback
     # =========================================================================
-    print("🎨 Generating your portrait...")
-    portrait_response = chat.send_message(get_portrait_prompt())
+    
+    # Load your photo
+    portrait_response = None
+    photo_path = "/home/aliceliu123321/my_photo.jpg"
+    if os.path.isfile(photo_path):
+        user_photo = Image.open(photo_path)
+    
+        # Convert photo to bytes for the API
+        photo_buffer = io.BytesIO()
+        user_photo.save(photo_buffer, format="JPEG")
+        photo_bytes = photo_buffer.getvalue()
+
+        print("🎨 Transforming your photo into an explorer portrait...")
+        
+        # Send both the prompt AND the image
+        portrait_response = chat.send_message([
+            get_photo_portrait_prompt(),
+            types.Part.from_bytes(data=photo_bytes, mime_type="image/jpeg")
+        ])
+    else:
+        print("🎨 Generating your portrait...")
+        portrait_response = chat.send_message(get_portrait_prompt())
+
 
     # Extract the image from the response.
     # Gemini returns a response with multiple "parts" - we need to find the image part.
