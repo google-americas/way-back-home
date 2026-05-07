@@ -1,4 +1,4 @@
-- # 🚀 Way Back Home
+# 🚀 Way Back Home
 
 ![Way Back Home](dashboard/frontend/public/prelude.png)
 
@@ -19,12 +19,12 @@ You're a space explorer whose ship has crashed on an uncharted planet. Your resc
 
 | Level | Mission | AI Skills Learned |
 |-------|---------|-------------------|
-| **Level 0** | Generate your explorer identity | Multi-turn image generation, Gemini (Nano Banana) |
-| **Level 1** | Pinpoint your crash location | Multi-agent systems, MCP servers, ADK, parallel processing |
-| **Level 2** | Process incoming SOS signals | Event-driven agents, A2A communication *(coming soon)* |
-| **Level 3** | Coordinate group rescue | Agent orchestration, consensus protocols *(coming soon)* |
-| **Level 4** | Coordinate group rescue | Agent orchestration, consensus protocols *(coming soon)* |
-| **Level 5** | Coordinate group rescue | Agent orchestration, consensus protocols *(coming soon)* |
+| **Level 0** | [Generate your identity](level_0/) | Multi-turn image generation, Gemini (Nano Banana) |
+| **Level 1** | [Pinpoint your crash location](level_1/) | Multi-agent systems, MCP servers, ADK, parallel processing |
+| **Level 2** | [Process SOS signals](level_2/) | Event-driven agents, A2A communication |
+| **Level 3** | Coordinate rescue (Alpha) | Agent orchestration, consensus protocols |
+| **Level 4** | Coordinate rescue (Beta) | Agent orchestration, consensus protocols |
+| **Level 5** | Coordinate rescue (Final) | Agent orchestration, consensus protocols |
 
 ## 🛠️ Technology Stack
 
@@ -142,6 +142,16 @@ See [Deployment Guide](#-deployment) below for running your own instance.
      --substitutions=_API_BASE_URL=$API_BASE_URL,_MAP_BASE_URL=$MAP_BASE_URL,_DEPLOY_BACKEND=false
    ```
 
+5. **Update Workshop Configuration:**
+   After deployment, you **must** update `workshop.config.json` with your actual URLs. This file is used by the `scripts/setup.sh` script that participants run.
+   
+   ```json
+   {
+       "api_base_url": "https://your-api-url-here",
+       "map_base_url": "https://your-frontend-url-here"
+   }
+   ```
+
 ### Environment Configuration
 
 Create a `set_env.sh` in project root:
@@ -185,40 +195,47 @@ Create a document in the `events` collection with the following structure:
 #### Method B: CLI (Recommended for automated setup)
 Use the provided Python script to create an event directly in Firestore using your authenticated `gcloud` credentials:
 ```bash
-python3 scripts/create_event.py your-event-code "Your Workshop Name" --project YOUR_PROJECT_ID
+python3 scripts/create_event.py your-event-code "Your Workshop Name" --project $(gcloud config get-value project)
 ```
 
-#### Method C: API
+#### Method C: Helper Tool (Easiest for Hosts)
+The repository includes a simple HTML tool to help you get a Firebase ID Token without using the command line:
+1. Open `dashboard/helper/get_firebase_token.html` in your browser.
+2. Ensure you've replaced the `firebaseConfig` in the file with your actual project config.
+3. Click "Sign in with Google".
+4. Copy the generated ID Token.
+
+#### Method D: API (Advanced)
 1. **Retrieve a Firebase ID Token from the terminal:**
    ```bash
    # 1. Get your Google Identity Token
    ID_TOKEN=$(gcloud auth print-identity-token)
    
-   # 2. Exchange it for a Firebase ID Token (requires Firebase Web API Key)
-   # You can find your API Key in the Firebase Console > Project Settings
+   # 2. Exchange it for a Firebase ID Token
+   # Requires your Firebase Web API Key (Firebase Console > Project Settings)
    API_KEY="YOUR_FIREBASE_WEB_API_KEY"
    
-   curl -s -X POST "https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=${API_KEY}" \
+   FIREBASE_TOKEN=$(curl -s -X POST "https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=${API_KEY}" \
      -H "Content-Type: application/json" \
-     -d "{\"postBody\": \"id_token=${ID_TOKEN}&providerId=google.com\", \"requestUri\": \"http://localhost\", \"returnIdpCredential\": true, \"returnSecureToken\": true}" | jq -r .idToken
+     -d "{\"postBody\": \"id_token=${ID_TOKEN}&providerId=google.com\", \"requestUri\": \"http://localhost\", \"returnIdpCredential\": true, \"returnSecureToken\": true}" | jq -r .idToken)
    ```
 
 2. **Call the Admin API:**
    ```bash
-   curl -X POST https://api.yourdomain.dev/admin/events \
+   curl -X POST $API_BASE_URL/admin/events \
      -H "Authorization: Bearer $FIREBASE_TOKEN" \
      -H "Content-Type: application/json" \
      -d '{"code": "your-event-code", "name": "Your Workshop Name"}'
    ```
 
-3. Generate QR codes pointing to your event URL.
+3. Generate QR codes pointing to your event URL (e.g., `$MAP_BASE_URL/e/your-event-code`).
 4. Test the full flow with a sample participant.
 
 ### During the Workshop
 
 1. Share the event code with participants
 2. Direct them to the [Level 0 Codelab](https://codelabs.developers.google.com/way-back-home-level-0/instructions)
-3. Monitor the live map at `https://yourdomain.dev/e/your-event-code`
+3. Monitor the live map at `$MAP_BASE_URL/e/your-event-code`
 4. Celebrate as beacons light up across the planet!
 
 ### Cost Estimates
